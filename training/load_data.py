@@ -19,4 +19,12 @@ def train_valid_test_split(image_files):
     train_files, valid_files = train_test_split(train_files,test_size=0.2)
     return train_files,valid_files,test_files
 
+def preprocess_image(img): 
+    img = cv2.resize(img,(28,28))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # binarize the image
+    # (pixel < 127) = 0 
+    # (plexel > 127) = 1
+    #ret,img = cv2.threshold(img,127,255,cv2.THRESH_BINARY)
 
+    return img/255
