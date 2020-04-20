@@ -36,8 +36,8 @@ import os
 from glob import glob
 import site 
 
-if 'BOARD' not in os.environ or os.environ['BOARD'] != 'Pynq-Z1':
-    print("Only supported on a Pynq Z1 Board")
+if 'os.environ['BOARD'] != 'Ultra96' and os.environ['BOARD'] != 'Pynq-Z1' and os.environ['BOARD'] != 'Pynq-Z2':
+    print("Only supported on a Ultra96, Pynq-Z1 or Pynq-Z2 Board")
     exit(1)
 
 
@@ -57,7 +57,6 @@ setup(
     data_files = [(os.path.join('/home/xilinx/jupyter_notebooks/bnn',root.replace('notebooks/','')), [os.path.join(root, f) for f in files]) for root, dirs, files in os.walk('notebooks/')],
     #data_files = [(os.path.join('/home/xilinx/jupyter_notebooks/bnn',root.replace('notebooks/','')), [os.path.join(root, f) for f in files]) for root, dirs, files in os.walk('bnn/src/')],
     description = "Classification using a hardware accelerated binary neural network"
-   
 )
 
 
