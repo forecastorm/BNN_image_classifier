@@ -63,9 +63,6 @@ if __name__ == "__main__":
     imgs = [load_image(img_path + file) for file in img_files]
     labels = [extract_label(file) for file in img_files]
 
-    for i in range(len(imgs)):
-        imgs[i] = preprocess_image(imgs[i])
-        cv2.imwrite("../binary_image/"+ str(i)+'.jpg',imgs[i] )
 
     # imgs shape by [158,1,28,28]
     imgs = 2* np.expand_dims(imgs,axis=1) -1
