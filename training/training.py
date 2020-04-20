@@ -40,7 +40,7 @@ if __name__ == "__main__":
     batch_size = 27
     learning_parameters.alpha = .1
     learning_parameters.epsilon = 1e-4
-    num_epochs = 1000
+    num_epochs = 100
     learning_parameters.dropout_in = .2 # 0. means no dropout
     learning_parameters.dropout_hidden = .5
     # "Glorot" means we are using the coefficients from Glorot's paper
@@ -93,18 +93,16 @@ if __name__ == "__main__":
     valid_images = np.where(valid_images < 0, -1, 1).astype(theano.config.floatX)
     test_images = np.where(test_images < 0, -1, 1).astype(theano.config.floatX)
 
-
     train_labels = np.hstack(labels[0:50])
     valid_labels = np.hstack(labels[50:100])
     test_labels = np.hstack(labels[100:])
-
 
 
     # Onehot the targets
     train_labels = np.float32(np.eye(2)[train_labels])    
     valid_labels = np.float32(np.eye(2)[valid_labels])
     test_labels = np.float32(np.eye(2)[test_labels])
-
+    
     # -------------------------------------------------------
 
     print('Building the MLP...') 

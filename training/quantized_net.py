@@ -9,11 +9,8 @@ import numpy as np
 # theano.sandbox.cuda.use('gpu1') 
 import theano
 import theano.tensor as T
-
 import lasagne
-
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
-
 import augmentors
 
 # a class to implemented an arbitrarily quantized version of the hard_tanh function.
@@ -110,8 +107,7 @@ def compute_grads(loss,network):
         params = layer.get_params(quantized=True)
         if params:
             # print(params[0].name)
-            grads.append(theano.grad(loss, wrt=layer.Wq))
-                
+            grads.append(theano.grad(loss, wrt=layer.Wq))     
     return grads
 
 # This functions clips the weights after the parameter update
@@ -119,9 +115,7 @@ def clipping_scaling(updates,network):
     
     layers = lasagne.layers.get_all_layers(network)
     updates = OrderedDict(updates)
-    
     for layer in layers:
-    
         params = layer.get_params(quantized=True)
         for param in params:
             print("W_LR_scale = "+str(layer.W_LR_scale))
@@ -210,14 +204,10 @@ def train(train_fn,val_fn,
     
     # This function tests the model a full epoch (on the whole dataset)
     def val_epoch(X,y):
-        
+    
         err = 0
         loss = 0
-        print("Length is ")
-        print(len(X))
         batches = len(X)/batch_size
-        print("batch is ")
-        print(batches)
         for i in range(batches):
             new_loss, new_err = val_fn(X[i*batch_size:(i+1)*batch_size], y[i*batch_size:(i+1)*batch_size])
             err += new_err
@@ -274,15 +264,15 @@ def train(train_fn,val_fn,
         epoch_duration = time.time() - start_time
         
         # Then we print the results for this epoch:
-        # print("Epoch "+str(epoch + 1)+" of "+str(num_epochs)+" took "+str(epoch_duration)+"s")
-        # print("  LR:                            "+str(LR))
-        # print("  training loss:                 "+str(train_loss))
-        # print("  validation loss:               "+str(val_loss))
-        # print("  validation error rate:         "+str(val_err)+"%")
-        # print("  best epoch:                    "+str(best_epoch))
-        # print("  best validation error rate:    "+str(best_val_err)+"%")
-        # print("  test loss:                     "+str(test_loss))
-        # print("  test error rate:               "+str(test_err)+"%") 
+        print("Epoch "+str(epoch + 1)+" of "+str(num_epochs)+" took "+str(epoch_duration)+"s")
+        print("  LR:                            "+str(LR))
+        print("  training loss:                 "+str(train_loss))
+        print("  validation loss:               "+str(val_loss))
+        print("  validation error rate:         "+str(val_err)+"%")
+        print("  best epoch:                    "+str(best_epoch))
+        print("  best validation error rate:    "+str(best_val_err)+"%")
+        print("  test loss:                     "+str(test_loss))
+        print("  test error rate:               "+str(test_err)+"%") 
         
         # decay the LR
         LR *= LR_decay
