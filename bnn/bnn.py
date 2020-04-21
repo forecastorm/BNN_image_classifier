@@ -183,7 +183,7 @@ class CnvClassifier:
 			self.bnn.load_parameters(os.path.join(params, network))
 			self.classes = self.bnn.classes
 		else:
-			print("ERROR: parameters are not availlable for {0}".format(network))
+			print("ERROR: parameters are not available for {0}".format(network))
 
 	# converting image to cifar10 format
 	def image_to_cifar(self, img, fp):
@@ -293,7 +293,7 @@ class LfcClassifier:
 			self.bnn.load_parameters(os.path.join(params, network))
 			self.classes = self.bnn.classes
 		else:
-			print("ERROR: parameters are not availlable for {0}".format(network))
+			print("ERROR: parameters are not available for {0}".format(network))
 
 	# classify single mnist formatted image, output is highest ranked class
 	def classify_mnist(self, mnist_format_file):
