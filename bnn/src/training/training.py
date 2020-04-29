@@ -46,7 +46,7 @@ if __name__ == "__main__":
     # "Glorot" means we are using the coefficients from Glorot's paper
     learning_parameters.W_LR_scale = "Glorot" 
     # learning rate decay
-    LR_start = .03
+    LR_start = .0003
     LR_fin = 0.0003
     LR_decay = (LR_fin/LR_start)**(1./num_epochs)
     shuffle_parts = 1
@@ -83,9 +83,9 @@ if __name__ == "__main__":
     # test:  0.15
     
     # shape by [110,1,28,28]
-    train_images = imgs[0:80]
+    train_images = imgs[0:70]
     # shape by [24,1,28,28]
-    valid_images = imgs[80:100]
+    valid_images = imgs[70:100]
     # shape by [24,1,28,28]
     test_images = imgs[100:]
 
@@ -96,8 +96,8 @@ if __name__ == "__main__":
     valid_images = np.where(valid_images < 0, -1, 1).astype(theano.config.floatX)
     test_images = np.where(test_images < 0, -1, 1).astype(theano.config.floatX)
 
-    train_labels = np.hstack(labels[0:80])
-    valid_labels = np.hstack(labels[80:100])
+    train_labels = np.hstack(labels[0:70])
+    valid_labels = np.hstack(labels[70:100])
     test_labels = np.hstack(labels[100:])
 
     # Onehot the targets
