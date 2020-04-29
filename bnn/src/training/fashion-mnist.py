@@ -36,7 +36,7 @@ from __future__ import print_function
 import sys
 import os
 import time
-
+from load_data import *
 import numpy as np
 np.random.seed(1234)  # for reproducibility
 
@@ -56,7 +56,6 @@ import lfc
 
 from pylearn2.datasets.mnist import MNIST
 from pylearn2.utils import serial
-from mlxtend.data import loadlocal_mnist
 from collections import OrderedDict
 
 if __name__ == "__main__":
@@ -64,17 +63,17 @@ if __name__ == "__main__":
     #--------------------------------------------
     learning_parameters = OrderedDict()
     # BN parameters
-    batch_size = 100
+    batch_size = 24
     print("batch_size = "+str(batch_size))
     # alpha is the exponential moving average factor
     # alpha = .15
-    learning_parameters.alpha = .1
+    learning_parameters.alpha = .5
     print("alpha = "+str(learning_parameters.alpha))
-    learning_parameters.epsilon = 1e-4
+    learning_parameters.epsilon = 1e-3
     print("epsilon = "+str(learning_parameters.epsilon))
     
     # Training parameters
-    num_epochs = 1000
+    num_epochs = 500
     print("num_epochs = "+str(num_epochs))
     
     # Dropout parameters
@@ -88,9 +87,9 @@ if __name__ == "__main__":
     print("W_LR_scale = "+str(learning_parameters.W_LR_scale))
     
     # Decaying LR 
-    LR_start = .003
+    LR_start = .01
     print("LR_start = "+str(LR_start))
-    LR_fin = 0.0000003
+    LR_fin = 0.00003
     print("LR_fin = "+str(LR_fin))
     LR_decay = (LR_fin/LR_start)**(1./num_epochs)
     print("LR_decay = "+str(LR_decay))
@@ -107,11 +106,7 @@ if __name__ == "__main__":
 
     print('Loading MNIST dataset...')
     
-    train_set = MNIST(which_set= 'train', start=0, stop = 50000, center = False)
-    valid_set = MNIST(which_set= 'train', start=50000, stop = 60000, center = False)
-    test_set = MNIST(which_set= 'test', center = False)
-    
-    img_path = "../BW28x28/"
+    img_path = "./BW28x28/"
     img_files = []
     # there was a ghost file getting added to this
     for file in os.listdir(img_path):
@@ -126,39 +121,76 @@ if __name__ == "__main__":
     for i in range(len(imgs)):
         imgs[i] = preprocess_image(i)
 
+    # imgs shape by [158,1,28,28]
+    imgs = 2* np.expand_dims(imgs,axis=-1) -1
+    print(imgs.shape)
 
+    # shuffle the imgs
+    np.random.shuffle(imgs)
 
-
-
-    print(len(train_set))
-
-
-    # bc01 format    
-    # Inputs in the range [-1,+1]
-    # print("Inputs in the range [-1,+1]")
-    train_set.X = 2* train_set.X.reshape(-1, 1, 28, 28) - 1.
-    valid_set.X = 2* valid_set.X.reshape(-1, 1, 28, 28) - 1.
-    test_set.X = 2* test_set.X.reshape(-1, 1, 28, 28) - 1.
+    # make (0, 255) to (-1, 1)
+    imgs = np.where(imgs == 0, -1, 1).astype(theano.config.floatX)
+    # split set as 
+    # train: 0.7; 
+    # valid: 0.15
+    # test:  0.15
     
+    # shape by [?,1,28,28]
+    train_images = imgs[0:150]
+    # shape by [?,1,28,28]
+    valid_images = imgs[150:]
+    # shape by [?,1,28,28]
+    test_images = imgs[150:]
+
+    print(train_images[0].shape)
+
     # Binarise the inputs.
-    train_set.X = np.where(train_set.X < 0, -1, 1).astype(theano.config.floatX)
-    valid_set.X = np.where(valid_set.X < 0, -1, 1).astype(theano.config.floatX)
-    test_set.X = np.where(test_set.X < 0, -1, 1).astype(theano.config.floatX)
+    train_images = np.where(train_images < 0, -1, 1).astype(theano.config.floatX)
+    valid_images = np.where(valid_images < 0, -1, 1).astype(theano.config.floatX)
+    test_images = np.where(test_images < 0, -1, 1).astype(theano.config.floatX)
 
-    # flatten targets
-    train_set.y = np.hstack(train_set.y)
-    valid_set.y = np.hstack(valid_set.y)
-    test_set.y = np.hstack(test_set.y)
-    
+    train_labels = np.hstack(labels[0:150])
+    valid_labels = np.hstack(labels[150:])
+    test_labels = np.hstack(labels[150:])
+
     # Onehot the targets
-    train_set.y = np.float32(np.eye(10)[train_set.y])    
-    valid_set.y = np.float32(np.eye(10)[valid_set.y])
-    test_set.y = np.float32(np.eye(10)[test_set.y])
-    
+    train_labels = np.float32(np.eye(2)[train_labels])    
+    valid_labels = np.float32(np.eye(2)[valid_labels])
+    test_labels = np.float32(np.eye(2)[test_labels])
+
+        
     # for hinge loss
-    train_set.y = 2* train_set.y - 1.
-    valid_set.y = 2* valid_set.y - 1.
-    test_set.y = 2* test_set.y - 1.
+    train_labels = 2* train_labels - 1.
+    valid_labels = 2* valid_labels - 1.
+    test_labels = 2* test_labels - 1.
+
+
+    # # bc01 format    
+    # # Inputs in the range [-1,+1]
+    # # print("Inputs in the range [-1,+1]")
+    # train_set.X = 2* train_set.X.reshape(-1, 1, 28, 28) - 1.
+    # valid_set.X = 2* valid_set.X.reshape(-1, 1, 28, 28) - 1.
+    # test_set.X = 2* test_set.X.reshape(-1, 1, 28, 28) - 1.
+    
+    # # Binarise the inputs.
+    # train_set.X = np.where(train_set.X < 0, -1, 1).astype(theano.config.floatX)
+    # valid_set.X = np.where(valid_set.X < 0, -1, 1).astype(theano.config.floatX)
+    # test_set.X = np.where(test_set.X < 0, -1, 1).astype(theano.config.floatX)
+
+    # # flatten targets
+    # train_set.y = np.hstack(train_set.y)
+    # valid_set.y = np.hstack(valid_set.y)
+    # test_set.y = np.hstack(test_set.y)
+    
+    # # Onehot the targets
+    # train_set.y = np.float32(np.eye(10)[train_set.y])    
+    # valid_set.y = np.float32(np.eye(10)[valid_set.y])
+    # test_set.y = np.float32(np.eye(10)[test_set.y])
+    
+    # # for hinge loss
+    # train_set.y = 2* train_set.y - 1.
+    # valid_set.y = 2* valid_set.y - 1.
+    # test_set.y = 2* test_set.y - 1.
 
     print('Building the MLP...') 
     
@@ -167,7 +199,7 @@ if __name__ == "__main__":
     target = T.matrix('targets')
     LR = T.scalar('LR', dtype=theano.config.floatX)
 
-    mlp = lfc.genLfc(input, 10, learning_parameters)
+    mlp = lfc.genLfc(input, 2, learning_parameters)
 
     train_output = lasagne.layers.get_output(mlp, deterministic=False)
     
@@ -197,14 +229,14 @@ if __name__ == "__main__":
 
     print('Training...')
     
-    # binary_net.train(
-    #         train_fn,val_fn,
-    #         mlp,
-    #         batch_size,
-    #         LR_start,LR_decay,
-    #         num_epochs,
-    #         train_set.X,train_set.y,
-    #         valid_set.X,valid_set.y,
-    #         test_set.X,test_set.y,
-    #         save_path,
-    #         shuffle_parts)
+    binary_net.train(
+            train_fn,val_fn,
+            mlp,
+            batch_size,
+            LR_start,LR_decay,
+            num_epochs,
+            train_images,train_labels,
+            valid_images,valid_labels,
+            test_images,test_labels,
+            save_path,
+            shuffle_parts)

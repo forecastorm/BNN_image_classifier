@@ -240,6 +240,7 @@ def train(train_fn,val_fn,
     def shuffle(X,y):
         
         # print(len(X))
+        # print(shuffle_parts)
         
         chunk_size = len(X)/shuffle_parts
         shuffled_range = range(chunk_size)
