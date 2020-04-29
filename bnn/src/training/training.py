@@ -51,7 +51,8 @@ if __name__ == "__main__":
     LR_decay = (LR_fin/LR_start)**(1./num_epochs)
     shuffle_parts = 1
     save_path = "train_validation-%dw-%da.npz" % (learning_parameters.weight_bits, learning_parameters.activation_bits)
-    # ------------------------------------------------
+    # ----------------------------------------------------
+
     img_path = "../train_validation/"
     img_files = []
     # there was a ghost file getting added to this
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     # test:  0.15
     
     # shape by [110,1,28,28]
-    train_images = imgs[0:50 ]
+    train_images = imgs[0:50]
     # shape by [24,1,28,28]
     valid_images = imgs[50:100]
     # shape by [24,1,28,28]
@@ -94,7 +95,6 @@ if __name__ == "__main__":
     valid_labels = np.hstack(labels[50:100])
     test_labels = np.hstack(labels[100:])
 
-
     # Onehot the targets
     train_labels = np.float32(np.eye(2)[train_labels])    
     valid_labels = np.float32(np.eye(2)[valid_labels])
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     # -------------------------------------------------------
 
     print('Building the MLP...') 
-    
+
     # Prepare Theano variables for inputs and targets
     input = T.tensor4('inputs')
     target = T.matrix('targets')

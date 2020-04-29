@@ -3,7 +3,6 @@
 This repo takes examples from [here](https://github.com/Xilinx/BNN-PYNQ), to get more details visit original repo. This repo will focus on the LFC model discussed in the original repository
 
 
-
 #  Training Quick Start 
 
 ## 1. Set up docker environment
