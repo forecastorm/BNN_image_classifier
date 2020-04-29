@@ -37,17 +37,17 @@ if __name__ == "__main__":
     print("weight_bits = "+str(learning_parameters.weight_bits))
 
     # hyper parameters-------------------------------
-    batch_size = 27
+    batch_size = 20
     learning_parameters.alpha = .1
     learning_parameters.epsilon = 1e-4
-    num_epochs = 100
+    num_epochs = 1000
     learning_parameters.dropout_in = .2 # 0. means no dropout
     learning_parameters.dropout_hidden = .5
     # "Glorot" means we are using the coefficients from Glorot's paper
     learning_parameters.W_LR_scale = "Glorot" 
     # learning rate decay
-    LR_start = .003
-    LR_fin = 0.0000003
+    LR_start = .03
+    LR_fin = 0.0003
     LR_decay = (LR_fin/LR_start)**(1./num_epochs)
     shuffle_parts = 1
     save_path = "train_validation-%dw-%da.npz" % (learning_parameters.weight_bits, learning_parameters.activation_bits)
@@ -65,34 +65,39 @@ if __name__ == "__main__":
     labels = [extract_label(file) for file in img_files]
 
 
+    for i in range(len(imgs)):
+        imgs[i] = preprocess_image(i)
+
     # imgs shape by [158,1,28,28]
-    imgs = 2* np.expand_dims(imgs,axis=1) -1
+    imgs = 2* np.expand_dims(imgs,axis=-1) -1
+    print(imgs.shape)
 
     # shuffle the imgs
     np.random.shuffle(imgs)
 
     # make (0, 255) to (-1, 1)
-    #imgs = np.where(imgs == 0, -1, 1).astype(theano.config.floatX)
+    imgs = np.where(imgs == 0, -1, 1).astype(theano.config.floatX)
     # split set as 
     # train: 0.7; 
     # valid: 0.15
     # test:  0.15
     
     # shape by [110,1,28,28]
-    train_images = imgs[0:50]
+    train_images = imgs[0:80]
     # shape by [24,1,28,28]
-    valid_images = imgs[50:100]
+    valid_images = imgs[80:100]
     # shape by [24,1,28,28]
     test_images = imgs[100:]
 
+    print(train_images[0].shape)
 
     # Binarise the inputs.
     train_images = np.where(train_images < 0, -1, 1).astype(theano.config.floatX)
     valid_images = np.where(valid_images < 0, -1, 1).astype(theano.config.floatX)
     test_images = np.where(test_images < 0, -1, 1).astype(theano.config.floatX)
 
-    train_labels = np.hstack(labels[0:50])
-    valid_labels = np.hstack(labels[50:100])
+    train_labels = np.hstack(labels[0:80])
+    valid_labels = np.hstack(labels[80:100])
     test_labels = np.hstack(labels[100:])
 
     # Onehot the targets

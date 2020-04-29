@@ -21,7 +21,7 @@ def train_valid_test_split(image_files):
 
 def preprocess_image(img): 
     img = cv2.resize(img,(28,28))
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # binarize the image
     # (pixel < 127) = 0 
     # (plexel > 127) = 1
